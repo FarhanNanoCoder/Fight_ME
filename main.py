@@ -50,7 +50,7 @@ class Game:
             self.shield_sprite = pygame.transform.scale(self.shield_sprite, self.scale((5,50)))
             self.shield_rect = self.shield_sprite.get_rect()
             
-            # positioning
+            # positioninge
             self.rect.left = self.scale(100)
             self.rect.bottom = self.ground
             self.X_change = 0
@@ -173,7 +173,8 @@ class Game:
         def update(self):
             '''Handle events that must take place every frame.'''
 
-            self.continue_knockback()
+      
+            self.continue_knockback()  # for ai player actually to continue after a hit
             self.continue_dash()
             self.continue_jump()
             self.check_fall()
@@ -288,6 +289,9 @@ class Game:
                             self.deploy_dash()
                     # always restart after stage 2
                     self.press_state = 0
+                # if(self.press_state==1 and press == self.most_recent_press):
+                #     self.press_state +=1
+                #     self.most_recent_press = press
             # if nothing is pressed and press_state is ready for upkey
             if (press is None) & (self.press_state == 1):
                 self.press_state += 1
@@ -484,6 +488,7 @@ class Game:
                 self.input_dict['sword']:0,
                 self.input_dict['shield']:0}
 
+
             if ai_scheme != 'random_input':
  
                 self.walk_left = [self.input_dict['left']]*10
@@ -513,37 +518,9 @@ class Game:
                 self.sequence = self.walk_left
                 self.sequence_break = False
                 self.avoiding = False
-
         def get_input(self):
+            return self._heuristics()
 
-            if self.ai_scheme == 'random_input':
-                return self._random_input()
-            elif self.ai_scheme == 'random_sequence':
-                return self._random_sequence()
-            elif self.ai_scheme == 'heuristic':
-                return self._heuristics()
-
-        def _random_input(self):
-        
-            ai_key_dict_copy = self.ai_key_dict.copy()
-            ai_key_dict_copy[random.sample(self.ai_key_dict.keys(),1)[0]] = 1
-            
-            return ai_key_dict_copy
-        
-        def _random_sequence(self):
-
-            if self.sequence_index == len(self.sequence)-1:
-                self.sequence = random.sample(self.sequence_list,1)[0]
-                self.sequence_index = 0
-            else:
-                self.sequence_index += 1
-
-            input = self.sequence[self.sequence_index]
-            
-            ai_key_dict_copy = self.ai_key_dict.copy()
-            ai_key_dict_copy[input] = 1
-            
-            return ai_key_dict_copy
         
         def _heuristics(self):
             
@@ -575,7 +552,7 @@ class Game:
                 sequence = self._avoid()
             # is over or under
             elif self._is_on_top():
-                possible_sequences = [self.down_strike,self.walk_right,self.walk_left]
+                possible_sequences = [self.down_strike,self.walk_right,self.walk_left] 
                 sequence = random.sample(possible_sequences,1)[0]
             elif self._is_under():
                 if self._has_stamina(3):
@@ -814,8 +791,8 @@ class Game:
             if keys[0].key == pygame.K_ESCAPE:
                     self.running = False
 
-        self._show_text('VORPΛL', font = self.over_font,)
-        texts = ['1 Player', '2 Player']
+        self._show_text('FIGHT ME', font = self.over_font,)
+        texts = ['Player vs Ai', 'Player vs Player']
         self._show_text(texts, text_y= 225, pointer = self.pointer)
 
     def _show_start_fight_menu(self):
@@ -1098,7 +1075,7 @@ class Game:
                 playerb.knockback_speed = -abs(playerb.knockback_speed)
                 playera.knockback_speed = abs(playerb.knockback_speed)
             
-            # hit shield and not player
+            # hit shield and not player``
             if shieldb_collide and not playerb_collide:
                 self.do_shield_hit(playera)
 

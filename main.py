@@ -523,6 +523,7 @@ class Game:
 
         
         def _heuristics(self):
+
             
             self._check_sequence_break()
 
@@ -543,6 +544,36 @@ class Game:
                 ai_key_dict_copy[i] = 1
             
             return ai_key_dict_copy
+
+        def minimax_decision(self,game_state, depth, maximizing_player):
+            if depth == 0 or game_state.is_terminal():
+                return self._choose_heuristic(game_state)
+
+            if maximizing_player:
+                max_utility = float('-inf')
+                best_action = None
+
+                for action in game_state.get_actions():
+                    child_state = game_state.get_child_state(action)
+                    utility = self.minimax_decision(child_state, depth - 1, False)
+
+                    if utility > max_utility:
+                        max_utility = utility
+                        best_action = action
+
+                if depth == MAX_DEPTH:
+                    return best_action
+                else:
+                    return max_utility
+            else:
+                min_utility = float('inf')
+
+                for action in game_state.get_actions():
+                    child_state = game_state.get_child_state(action)
+                    utility = self.minimax_decision(child_state, depth - 1, True)
+                    min_utility = min(min_utility, utility)
+
+                return min_utility
 
         def _choose_heuristic(self):
 
